@@ -81,17 +81,18 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
   private typeStep = () => {
     const { spool, spoolIndex, wordIndex } = this.state;
     const isDoneTypingWord = wordIndex === spool[spoolIndex].length;
-    if (isDoneTypingWord) {
-      this.onTyped();
-      return;
-    }
+
     this.onType();
+    if (isDoneTypingWord) {
+      return this.onTyped();
+    }
   }
 
   private eraseStep = () => {
     const { wordIndex, typerInterval } = this.state;
     const isDoneErasingWord = wordIndex === 0;
 
+    this.onErase();
     if (isDoneErasingWord) {
       const { eraseStyle, preClearDelay } = this.props;
       const isSelectionErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.SELECT;
@@ -102,7 +103,6 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
       }
       return this.onErased();
     }
-    this.onErase();
   }
 
   private shiftCaret = (delta: number, cb?: () => void) => {

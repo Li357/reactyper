@@ -1,0 +1,30 @@
+{
+  "name": "react-typer",
+  "version": "0.1.0",
+  "description": "A React component that types.",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "files": [
+    "dist"
+  ],
+  "types": "index.d.ts",
+  "repository": "git+https://github.com/Li357/react-typer.git",
+  "author": "Andrew Li",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -w -c rollup.config.js",
+    "lint": "tslint -c tslint.json 'src/**/*.ts*'"
+  },
+  "devDependencies": {
+    "@types/memoize-one": "^4.1.0",
+    "@types/react": "^16.7.20",
+    "rollup": "^1.1.2",
+    "rollup-plugin-postcss": "^2.0.1",
+    "rollup-plugin-typescript2": "^0.19.2",
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.4"
+  },
+  "peerDependencies": {
+    "react": ">=16.3.0"
+  }
+}

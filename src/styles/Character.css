@@ -1,0 +1,18 @@
+.react-typer-char {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+.typed {
+  color: black;
+}
+
+.untyped, .erased {
+  display: none;
+}
+
+.selected {
+  display: inline-block;
+  background-color: #ACCEF7;
+  color: black;
+}

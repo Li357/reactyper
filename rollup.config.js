@@ -1,5 +1,7 @@
 import typescript from 'rollup-plugin-typescript2';
 import postcss from 'rollup-plugin-postcss';
+import autoprefixer from 'autoprefixer';
+import { terser } from 'rollup-plugin-terser';
 
 import pkg from './package.json';
 
@@ -17,8 +19,16 @@ export default {
     },
     {
       file: pkg.module,
-      format: 'es',
+      format: 'esm',
     },
+    {
+      file: 'dist/react-typer.min.js',
+      format: 'umd',
+      globals: {
+        react: 'React',
+      },
+      name: 'Typer',
+    }
   ],
   external: getDependencies(pkg),
   plugins: [
@@ -26,6 +36,11 @@ export default {
       typescript: require('typescript'),
       objectHashIgnoreUnknownHack: true,
     }),
-    postcss(),
+    postcss({
+      plugins: [
+        autoprefixer({ browsers: ['last 2 versions'] })
+      ],
+    }),
+    terser(),
   ],
 };

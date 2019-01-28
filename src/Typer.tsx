@@ -12,10 +12,10 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
     repeats: Infinity,
     shuffle: false,
 
-    preTypeDelay: 250,
-    typeDelay: 250,
-    preEraseDelay: 500,
-    eraseDelay: 70,
+    preTypeDelay: 70,
+    typeDelay: 70,
+    preEraseDelay: 2000,
+    eraseDelay: 250,
     preClearDelay: 1000,
 
     initialAction: TyperState.TYPING,
@@ -82,27 +82,33 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
     const { spool, spoolIndex, wordIndex } = this.state;
     const isDoneTypingWord = wordIndex === spool[spoolIndex].length;
 
-    this.onType();
+    this.props.onType();
     if (isDoneTypingWord) {
       return this.onTyped();
     }
+    this.shiftCaret(1);
   }
 
   private eraseStep = () => {
-    const { wordIndex, typerInterval } = this.state;
-    const isDoneErasingWord = wordIndex === 0;
+    const isDoneErasingWord = this.state.wordIndex === 0;
+    const { eraseStyle, preClearDelay, onErase } = this.props;
 
-    this.onErase();
+    onErase();
     if (isDoneErasingWord) {
-      const { eraseStyle, preClearDelay } = this.props;
       const isSelectionErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.SELECT;
       if (isSelectionErase) {
-        window.clearInterval(typerInterval);
+        window.clearInterval(this.state.typerInterval);
         const typerTimeout = window.setTimeout(this.onErased, preClearDelay);
         return this.setState({ typerTimeout });
       }
       return this.onErased();
     }
+
+    const isAllErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.CLEAR;
+    if (isAllErase) {
+      return this.shiftCaret(-this.state.wordIndex);
+    }
+    this.shiftCaret(-1);
   }
 
   private shiftCaret = (delta: number, cb?: () => void) => {
@@ -119,20 +125,6 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
 
   private advanceSpool = (cb: () => void) => {
     this.setState(({ spoolIndex }) => ({ spoolIndex: spoolIndex + 1 }), cb);
-  }
-
-  private onType = () => {
-    this.shiftCaret(1, () => this.props.onType());
-  }
-
-  private onErase = () => {
-    const { eraseStyle } = this.props;
-
-    const isAllErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.CLEAR;
-    if (isAllErase) {
-      return this.shiftCaret(-this.state.wordIndex);
-    }
-    this.shiftCaret(-1, () => this.props.onErase());
   }
 
   private onTyped = () => {

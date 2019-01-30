@@ -1,4 +1,5 @@
 import typescript from 'rollup-plugin-typescript2';
+import resolve from 'rollup-plugin-node-resolve';
 import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
 import { terser } from 'rollup-plugin-terser';
@@ -26,6 +27,7 @@ export default {
       format: 'umd',
       globals: {
         react: 'React',
+        'lodash.split': '_.split',
       },
       name: 'Typer',
     }
@@ -36,9 +38,10 @@ export default {
       typescript: require('typescript'),
       objectHashIgnoreUnknownHack: true,
     }),
+    resolve(),
     postcss({
       plugins: [
-        autoprefixer({ browsers: ['last 2 versions'] })
+        autoprefixer({ browsers: ['last 2 versions'] }),
       ],
     }),
     terser(),

@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { Component } from 'react';
+import split from 'lodash.split';
 
 import Caret from './Caret';
 import Character from './Character';
@@ -6,7 +7,7 @@ import { CaretAnimationStyle, EraseStyle, ITyperProps, ITyperState, TyperState }
 import shuffle from './util/shuffle';
 import './styles/Typer.css';
 
-export default class Typer extends React.Component<ITyperProps, ITyperState> {
+export default class Typer extends Component<ITyperProps, ITyperState> {
   public static defaultProps: ITyperProps = {
     spool: ['React Typer'],
     repeats: Infinity,
@@ -80,7 +81,8 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
 
   private typeStep = () => {
     const { spool, spoolIndex, wordIndex } = this.state;
-    const isDoneTypingWord = wordIndex === spool[spoolIndex].length;
+    const chars = split(spool[spoolIndex], '');
+    const isDoneTypingWord = wordIndex === chars.length;
 
     this.props.onType();
     if (isDoneTypingWord) {
@@ -90,14 +92,15 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
   }
 
   private eraseStep = () => {
-    const isDoneErasingWord = this.state.wordIndex === 0;
+    const { typerInterval, wordIndex } = this.state;
     const { eraseStyle, preClearDelay, onErase } = this.props;
+    const isDoneErasingWord = wordIndex === 0;
 
     onErase();
     if (isDoneErasingWord) {
       const isSelectionErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.SELECT;
       if (isSelectionErase) {
-        window.clearInterval(this.state.typerInterval);
+        window.clearInterval(typerInterval);
         const typerTimeout = window.setTimeout(this.onErased, preClearDelay);
         return this.setState({ typerTimeout });
       }
@@ -106,7 +109,7 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
 
     const isAllErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.CLEAR;
     if (isAllErase) {
-      return this.shiftCaret(-this.state.wordIndex);
+      return this.shiftCaret(-wordIndex);
     }
     this.shiftCaret(-1);
   }
@@ -177,7 +180,7 @@ export default class Typer extends React.Component<ITyperProps, ITyperState> {
     const { spool, spoolIndex, wordIndex, typerState } = this.state;
     const { eraseStyle } = this.props;
 
-    const chars = spool[spoolIndex].split('');
+    const chars = split(spool[spoolIndex], '');
     const leftChars = chars.slice(0, wordIndex);
     const rightChars = chars.slice(wordIndex);
 

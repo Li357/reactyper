@@ -1,20 +1,35 @@
-export enum TyperState {
+// Since Node's versions return a NodeJS.Timer, not number, and window does not work with Jest
+declare global {
+  function setTimeout(callback: () => void, timeout: number): number;
+  function setInterval(callback: () => void, interval: number): number;
+  function clearTimeout(id: number): void;
+  function clearInterval(id: number): void;
+}
+
+export const enum TyperState {
   TYPING = 'typing',
   ERASING = 'erasing',
   COMPLETE = 'complete',
 }
 
-export enum EraseStyle {
+export const enum EraseStyle {
   BACKSPACE = 'backspace',
   SELECT = 'select',
   SELECTALL = 'select-all',
   CLEAR = 'clear',
 }
 
-export enum CaretAnimationStyle {
+export const enum CaretAnimationStyle {
   SOLID = 'solid',
   BLINK = 'blink',
   SMOOTH = 'smooth',
+}
+
+export const enum CharacterStatus {
+  UNTYPED = 'untyped',
+  TYPED = 'typed',
+  SELECTED = 'selected',
+  ERASED = 'erased',
 }
 
 export interface ITyperProps {
@@ -57,5 +72,5 @@ export interface ICaretProps {
 
 export interface ICharacterProps {
   value: string;
-  status: string;
+  status: CharacterStatus;
 }

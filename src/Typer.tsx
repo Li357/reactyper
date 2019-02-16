@@ -66,11 +66,10 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
       const typerInterval = setInterval(this.typeStep, typeDelay);
       this.setState({ typerInterval });
     }, preTypeDelay);
-    this.setState(({ repeatCount }) => ({
+    this.setState({
       typerTimeout,
       typerState: TyperState.TYPING,
-      repeatCount: repeatCount + 1,
-    }));
+    });
   }
 
   private startErasing() {
@@ -144,7 +143,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
 
     clearInterval(typerInterval);
     onTyped();
-    if (isLastWord || !shouldRepeat) { // !shouldRepeat makes sure repeats takes precedence over spool length
+    if (isLastWord) {
       if (eraseOnComplete || shouldRepeat) {
         return this.startErasing();
       }
@@ -164,7 +163,11 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     onErased();
     if (isLastWord) {
       if (shouldRepeat) {
-        return this.resetSpool(this.startTyping);
+        return this.resetSpool(() => {
+          this.setState({
+            repeatCount: repeatCount + 1,
+          }, this.startTyping);
+        });
       }
       return this.onFinish();
     }

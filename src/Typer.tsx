@@ -126,9 +126,12 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
 
   private resetSpool = (cb: () => void) => {
     const { spool, shuffle: shouldShuffle } = this.props;
+    const shuffledSpool = shouldShuffle ? shuffle(spool) : spool;
     this.setState({
       spoolIndex: 0,
-      spool: shouldShuffle ? shuffle(spool) : spool,
+      currentWord: shuffledSpool[0],
+      currentChars: split(shuffledSpool[0], ''),
+      spool: shuffledSpool,
     }, cb);
   }
 

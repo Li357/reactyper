@@ -3,15 +3,15 @@
   white-space: pre-wrap;
 }
 
-.typed {
+.react-typer-char.typed {
   color: black;
 }
 
-.untyped, .erased {
+.react-typer-char.untyped, .react-typer-char.erased {
   display: none;
 }
 
-.selected {
+.react-typer-char.selected {
   display: inline-block;
   background-color: #ACCEF7;
   color: black;

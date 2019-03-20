@@ -48,10 +48,10 @@ export interface ITyperProps {
   eraseStyle: EraseStyle;
   caretAnimationStyle: CaretAnimationStyle;
 
-  onType: () => void; // TODO: fix args
-  onTyped: () => void;
-  onErase: () => void;
-  onErased: () => void;
+  onType: (typed?: string) => void;
+  onTyped: (typed?: string) => void;
+  onErase: (erased?: string) => void;
+  onErased: (erased?: string) => void;
   onFinish: () => void;
 }
 
@@ -60,6 +60,8 @@ export interface ITyperState {
   spool: string[];
   spoolIndex: number;
   wordIndex: number;
+  currentWord: string;
+  currentChars: string[];
 
   typerState: TyperState;
   typerTimeout: number;

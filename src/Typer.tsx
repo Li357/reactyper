@@ -35,11 +35,14 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     super(props);
 
     const { shuffle: shouldShuffle, spool, initialAction } = this.props;
+    const shuffledSpool = shouldShuffle ? shuffle(spool) : spool;
     this.state = {
       repeatCount: 0,
-      spool: shouldShuffle ? shuffle(spool) : spool,
+      spool: shuffledSpool,
       spoolIndex: 0,
       wordIndex: 0,
+      currentWord: shuffledSpool[0],
+      currentChars: split(shuffledSpool[0], ''),
 
       typerState: initialAction,
       typerTimeout: 0,
@@ -52,8 +55,8 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     if (initialAction === TyperState.TYPING) {
       this.startTyping();
     } else if (initialAction === TyperState.ERASING) {
-      const { spool, spoolIndex } = this.state;
-      this.shiftCaret(spool[spoolIndex].length);
+      const { currentWord } = this.state;
+      this.shiftCaret(currentWord.length);
       this.startErasing();
     }
   }
@@ -84,11 +87,10 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   }
 
   private typeStep = () => {
-    const { spool, spoolIndex, wordIndex } = this.state;
-    const chars = split(spool[spoolIndex], '');
-    const isDoneTypingWord = wordIndex === chars.length;
+    const { wordIndex, currentChars } = this.state;
+    const isDoneTypingWord = wordIndex === currentChars.length;
 
-    this.props.onType();
+    this.props.onType(currentChars.slice(0, wordIndex).join(''));
     if (isDoneTypingWord) {
       return this.onTyped();
     }
@@ -96,11 +98,11 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   }
 
   private eraseStep = () => {
-    const { typerInterval, wordIndex } = this.state;
+    const { currentChars, typerInterval, wordIndex } = this.state;
     const { eraseStyle, preClearDelay, onErase } = this.props;
     const isDoneErasingWord = wordIndex === 0;
 
-    onErase();
+    onErase(currentChars.slice(0, wordIndex).join(''));
     if (isDoneErasingWord) {
       const isSelectionErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.SELECT;
       if (isSelectionErase) {
@@ -131,18 +133,26 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   }
 
   private advanceSpool = (cb: () => void) => {
-    this.setState(({ spoolIndex }) => ({ spoolIndex: spoolIndex + 1 }), cb);
+    this.setState(({ spoolIndex, spool }) => {
+      const nextIndex = spoolIndex + 1;
+      const nextWord = spool[nextIndex];
+      return {
+        spoolIndex: nextIndex,
+        currentWord: nextWord,
+        currentChars: split(nextWord, ''),
+      };
+    }, cb);
   }
 
   private onTyped = () => {
-    const { spool, spoolIndex, repeatCount, typerInterval } = this.state;
+    const { spool, spoolIndex, currentWord, repeatCount, typerInterval } = this.state;
     const { repeats, eraseOnComplete, onTyped } = this.props;
 
     const isLastWord = spoolIndex === spool.length - 1;
     const shouldRepeat = repeatCount < repeats;
 
     clearInterval(typerInterval);
-    onTyped();
+    onTyped(currentWord);
     if (isLastWord) {
       if (eraseOnComplete || shouldRepeat) {
         return this.startErasing();
@@ -153,14 +163,14 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   }
 
   private onErased = () => {
-    const { spool, spoolIndex, repeatCount, typerInterval } = this.state;
+    const { spool, spoolIndex, currentWord, repeatCount, typerInterval } = this.state;
     const { repeats, onErased } = this.props;
 
     const isLastWord = spoolIndex === spool.length - 1;
     const shouldRepeat = repeatCount < repeats;
 
     clearInterval(typerInterval);
-    onErased();
+    onErased(currentWord);
     if (isLastWord) {
       if (shouldRepeat) {
         return this.resetSpool(() => {
@@ -185,12 +195,11 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   }
 
   public render() {
-    const { spool, spoolIndex, wordIndex, typerState } = this.state;
+    const { currentChars, wordIndex, typerState } = this.state;
     const { eraseStyle } = this.props;
 
-    const chars = split(spool[spoolIndex], '');
-    const leftChars = chars.slice(0, wordIndex);
-    const rightChars = chars.slice(wordIndex);
+    const leftChars = currentChars.slice(0, wordIndex);
+    const rightChars = currentChars.slice(wordIndex);
 
     const isTyping = typerState === TyperState.TYPING;
     const isFinished = typerState === TyperState.COMPLETE;

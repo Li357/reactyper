@@ -90,11 +90,12 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     const { wordIndex, currentChars } = this.state;
     const isDoneTypingWord = wordIndex === currentChars.length;
 
-    this.props.onType(currentChars.slice(0, wordIndex).join(''));
     if (isDoneTypingWord) {
       return this.onTyped();
     }
-    this.shiftCaret(1);
+    this.shiftCaret(1, () => {
+      this.props.onType(currentChars.slice(0, this.state.wordIndex).join(''));
+    });
   }
 
   private eraseStep = () => {
@@ -102,7 +103,6 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     const { eraseStyle, preClearDelay, onErase } = this.props;
     const isDoneErasingWord = wordIndex === 0;
 
-    onErase(currentChars.slice(0, wordIndex).join(''));
     if (isDoneErasingWord) {
       const isSelectionErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.SELECT;
       if (isSelectionErase) {
@@ -117,7 +117,9 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     if (isAllErase) {
       return this.shiftCaret(-wordIndex);
     }
-    this.shiftCaret(-1);
+    this.shiftCaret(-1, () => {
+      onErase(currentChars.slice(0, this.state.wordIndex).join(''));
+    });
   }
 
   private shiftCaret = (delta: number, cb?: () => void) => {

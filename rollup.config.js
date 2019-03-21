@@ -44,6 +44,10 @@ export default {
         autoprefixer({ browsers: ['last 2 versions'] }),
       ],
     }),
-    terser(),
+    terser({
+      mangle: {
+        reserved: ['Typer', 'Character', 'Caret'],
+      },
+    }),
   ],
 };

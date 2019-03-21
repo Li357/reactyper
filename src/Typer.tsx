@@ -17,7 +17,6 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     typeDelay: 70,
     preEraseDelay: 2000,
     eraseDelay: 250,
-    preClearDelay: 1000,
 
     initialAction: TyperState.TYPING,
     eraseOnComplete: false,

@@ -42,7 +42,6 @@ export interface ITyperProps {
   typeDelay: number;
   preEraseDelay: number;
   eraseDelay: number;
-  preClearDelay: number;
 
   initialAction: TyperState.TYPING | TyperState.ERASING;
   eraseOnComplete: boolean;

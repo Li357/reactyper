@@ -15,7 +15,7 @@
     "build": "yarn rollup -c rollup.config.js",
     "build:watch": "yarn build -w",
     "lint": "yarn tslint -c tslint.json 'src/**/*.ts*'",
-    "test": "yarn jest",
+    "test": "yarn jest --coverage",
     "test:watch": "yarn test --watch"
   },
   "devDependencies": {

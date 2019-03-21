@@ -10,6 +10,7 @@ export const enum TyperState {
   TYPING = 'typing',
   ERASING = 'erasing',
   COMPLETE = 'complete',
+  IDLE = 'idle',
 }
 
 export const enum EraseStyle {
@@ -48,10 +49,10 @@ export interface ITyperProps {
   eraseStyle: EraseStyle;
   caretAnimationStyle: CaretAnimationStyle;
 
-  onType: (typed?: string) => void;
-  onTyped: (typed?: string) => void;
-  onErase: (erased?: string) => void;
-  onErased: (erased?: string) => void;
+  onType: (typed: string) => void;
+  onTyped: (typed: string) => void;
+  onErase: (erased: string) => void;
+  onErased: (erased: string) => void;
   onFinish: () => void;
 }
 

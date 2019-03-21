@@ -34,163 +34,177 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   constructor(props: ITyperProps) {
     super(props);
 
-    const { shuffle: shouldShuffle, spool, initialAction } = this.props;
+    const { shuffle: shouldShuffle, spool } = this.props;
     const shuffledSpool = shouldShuffle ? shuffle(spool) : spool;
     this.state = {
       repeatCount: 0,
-      spool: shuffledSpool,
-      spoolIndex: 0,
+      spool: shuffledSpool.filter((str) => str.length !== 0), // Ignore empty strings
+      spoolIndex: -1, // So that spoolIndex is incremented to 0 when first typing
       wordIndex: 0,
-      currentWord: shuffledSpool[0],
-      currentChars: split(shuffledSpool[0], ''),
+      currentWord: '',
+      currentChars: [],
 
-      typerState: initialAction,
+      typerState: TyperState.IDLE,
       typerTimeout: 0,
       typerInterval: 0,
     };
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
     const { initialAction } = this.props;
     if (initialAction === TyperState.TYPING) {
       this.startTyping();
     } else if (initialAction === TyperState.ERASING) {
-      const { currentWord } = this.state;
-      this.shiftCaret(currentWord.length);
+      await this.advanceSpool();
+      await this.shiftCaret(this.state.currentWord.length);
       this.startErasing();
     }
   }
 
-  private startTyping = () => {
-    const { preTypeDelay, typeDelay } = this.props;
+  /* Utility methods */
+  private safeSetState = <K extends keyof ITyperState>(
+    state: (
+      ((prevState: Readonly<ITyperState>, props: Readonly<ITyperProps>) => Pick<ITyperState, K>) | Pick<ITyperState, K>
+    ),
+  ) => new Promise((resolve) => this.setState(state, resolve))
 
-    const typerTimeout = setTimeout(() => {
-      this.typeStep();
-      const typerInterval = setInterval(this.typeStep, typeDelay);
-      this.setState({ typerInterval });
-    }, preTypeDelay);
-    this.setState({
-      typerTimeout,
-      typerState: TyperState.TYPING,
-    });
-  }
-
-  private startErasing() {
-    const { preEraseDelay, eraseDelay } = this.props;
-
-    const typerTimeout = setTimeout(() => {
-      this.eraseStep();
-      const typerInterval = setInterval(this.eraseStep, eraseDelay);
-      this.setState({ typerInterval });
-    }, preEraseDelay);
-    this.setState({ typerTimeout, typerState: TyperState.ERASING });
-  }
-
-  private typeStep = () => {
-    const { wordIndex, currentChars } = this.state;
-    const isDoneTypingWord = wordIndex === currentChars.length;
-
-    if (isDoneTypingWord) {
-      return this.onTyped();
-    }
-    this.shiftCaret(1, () => {
-      this.props.onType(currentChars.slice(0, this.state.wordIndex).join(''));
-    });
-  }
-
-  private eraseStep = () => {
-    const { currentChars, typerInterval, wordIndex } = this.state;
-    const { eraseStyle, preClearDelay, onErase } = this.props;
-    const isDoneErasingWord = wordIndex === 0;
-
-    if (isDoneErasingWord) {
-      const isSelectionErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.SELECT;
-      if (isSelectionErase) {
-        clearInterval(typerInterval);
-        const typerTimeout = setTimeout(this.onErased, preClearDelay);
-        return this.setState({ typerTimeout });
-      }
-      return this.onErased();
-    }
-
-    const isAllErase = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.CLEAR;
-    if (isAllErase) {
-      return this.shiftCaret(-wordIndex);
-    }
-    this.shiftCaret(-1, () => {
-      onErase(currentChars.slice(0, this.state.wordIndex).join(''));
-    });
-  }
-
-  private shiftCaret = (delta: number, cb?: () => void) => {
-    this.setState(({ wordIndex }) => ({ wordIndex: wordIndex + delta }), cb);
-  }
-
-  private resetSpool = (cb: () => void) => {
-    const { spool, shuffle: shouldShuffle } = this.props;
-    const shuffledSpool = shouldShuffle ? shuffle(spool) : spool;
-    this.setState({
-      spoolIndex: 0,
-      currentWord: shuffledSpool[0],
-      currentChars: split(shuffledSpool[0], ''),
-      spool: shuffledSpool,
-    }, cb);
-  }
-
-  private advanceSpool = (cb: () => void) => {
-    this.setState(({ spoolIndex, spool }) => {
+  private advanceSpool = async () => {
+    await this.safeSetState(({ spool, spoolIndex }) => {
       const nextIndex = spoolIndex + 1;
       const nextWord = spool[nextIndex];
+
       return {
         spoolIndex: nextIndex,
         currentWord: nextWord,
         currentChars: split(nextWord, ''),
       };
-    }, cb);
+    });
   }
 
-  private onTyped = () => {
-    const { spool, spoolIndex, currentWord, repeatCount, typerInterval } = this.state;
-    const { repeats, eraseOnComplete, onTyped } = this.props;
+  private resetSpool = async () => {
+    await this.safeSetState(({ repeatCount }, { shuffle: shouldShuffle, spool }) => {
+      const shuffledSpool = shouldShuffle ? shuffle(spool) : spool;
+      const nextWord = shuffledSpool[0];
 
+      return {
+        repeatCount: repeatCount + 1,
+        spool: shuffledSpool,
+        spoolIndex: 0,
+        currentWord: nextWord,
+        currentChars: split(nextWord, ''),
+      };
+    });
+  }
+
+  private shiftCaret = async (delta: number) => {
+    await this.safeSetState(({ wordIndex }) => ({ wordIndex: wordIndex + delta }));
+  }
+
+  /* Typer lifecycle methods */
+  private startTyping = (reset: boolean = false) => {
+    const { preTypeDelay, typeDelay } = this.props;
+
+    const typerTimeout = setTimeout(async () => {
+      if (reset) {
+        await this.resetSpool();
+      } else {
+        await this.advanceSpool();
+      }
+
+      await this.safeSetState({ typerState: TyperState.TYPING });
+      await this.typeStep();
+      if (this.state.currentWord.length > 1) { // Since a one-length string will finish typing after initial step
+        const typerInterval = setInterval(this.typeStep, typeDelay);
+        this.setState({ typerInterval });
+      }
+    }, preTypeDelay);
+    this.setState({ typerTimeout });
+  }
+
+  private typeStep = async () => {
+    await this.shiftCaret(1);
+
+    const { wordIndex, currentChars } = this.state;
+    const isDoneTypingWord = wordIndex === currentChars.length;
+    const currentlyTyped = currentChars.slice(0, wordIndex).join('');
+
+    this.props.onType(currentlyTyped);
+    if (isDoneTypingWord) {
+      this.finishTyping();
+    }
+  }
+
+  private finishTyping = async () => {
+    const { onTyped, eraseOnComplete, repeats } = this.props;
+    const { spoolIndex, spool, currentWord, repeatCount, typerInterval } = this.state;
     const isLastWord = spoolIndex === spool.length - 1;
     const shouldRepeat = repeatCount < repeats;
 
     clearInterval(typerInterval);
     onTyped(currentWord);
+
+    await this.safeSetState({ typerState: TyperState.IDLE });
     if (isLastWord) {
       if (eraseOnComplete || shouldRepeat) {
         return this.startErasing();
       }
-      return this.onFinish();
+      return this.finish();
     }
     this.startErasing();
   }
 
-  private onErased = () => {
-    const { spool, spoolIndex, currentWord, repeatCount, typerInterval } = this.state;
-    const { repeats, onErased } = this.props;
+  private startErasing = async () => {
+    const { preEraseDelay, eraseDelay } = this.props;
 
+    const typerTimeout = setTimeout(async () => {
+      await this.safeSetState({ typerState: TyperState.ERASING });
+      await this.eraseStep();
+      if (this.state.currentWord.length > 1) { // See startTyping
+        const typerInterval = setInterval(this.eraseStep, eraseDelay);
+        this.setState({ typerInterval });
+      }
+    }, preEraseDelay);
+    this.setState({ typerTimeout });
+  }
+
+  private eraseStep = async () => {
+    const { eraseStyle } = this.props;
+    const isAllEraseStyle = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.CLEAR;
+
+    await this.shiftCaret(isAllEraseStyle ? -this.state.wordIndex : -1);
+
+    const { wordIndex, currentChars } = this.state;
+    const isDoneErasingWord = wordIndex === 0;
+    const currentlyErased = currentChars.slice(0, wordIndex).join('');
+
+    this.props.onErase(currentlyErased);
+    if (isDoneErasingWord) {
+      this.finishErasing();
+    }
+  }
+
+  private finishErasing = async () => {
+    const { repeats, onErased } = this.props;
+    const { spool, spoolIndex, currentWord, repeatCount, typerInterval } = this.state;
     const isLastWord = spoolIndex === spool.length - 1;
     const shouldRepeat = repeatCount < repeats;
 
     clearInterval(typerInterval);
     onErased(currentWord);
+
+    await this.safeSetState({ typerState: TyperState.IDLE });
     if (isLastWord) {
       if (shouldRepeat) {
-        return this.resetSpool(() => {
-          this.setState({
-            repeatCount: repeatCount + 1,
-          }, this.startTyping);
-        });
+        return this.startTyping(true);
       }
-      return this.onFinish();
+      return this.finish();
     }
-    this.advanceSpool(this.startTyping);
+    this.startTyping();
   }
 
-  private onFinish = () => {
-    this.setState({ typerState: TyperState.COMPLETE }, () => this.props.onFinish());
+  private finish = async () => {
+    await this.safeSetState({ typerState: TyperState.COMPLETE });
+    this.props.onFinish();
   }
 
   public componentWillUnmount() {

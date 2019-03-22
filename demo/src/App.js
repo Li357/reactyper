@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import Typer from 'react-typer';
+import Typer from 'reactyper';
 
 class App extends Component {
   onType = (typed) => {
@@ -25,7 +25,7 @@ class App extends Component {
   }
 
   render() {
-    const spool = ['🎉 React Typer', '🎊 Hello World!'];
+    const spool = ['🎉 ReacTyper', '🎊 Hello World!'];
 
     return (
       <div className="App">

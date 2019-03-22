@@ -7,9 +7,9 @@
 </p>
 
 ```js
-import Typer from 'react-typer';
+import Typer from 'reactyper';
 
-<Typer spool={['🎉 React Typer']} />
+<Typer spool={['🎉 ReacTyper']} />
 ```
 
 - [Installation](#Installation)
@@ -39,19 +39,19 @@ import Typer from 'react-typer';
 
 #### Node
 
-    $ npm i react-typer
+    $ npm i reactyper
 
 or
 
-    $ yarn add react-typer
+    $ yarn add reactyper
 
 Then import:
 
-    import Typer from 'react-typer';
+    import Typer from 'reactyper';
 
 #### Browser
 
-    <script src="https://unpkg.com/react-typer/dist/react-typer.min.js">
+    <script src="https://unpkg.com/reactyper/dist/reactyper.min.js">
 
 And access via `window.Typer`.
 
@@ -128,41 +128,41 @@ Each prop is listed in the format `<prop>: <type> = <default-value>`. **Note:** 
 The typer's styles are set to a relatively low specificity to allow overwriting them:
 
 ```css
-.react-typer {
+.reactyper {
   /* styles for entire typer span */
 }
 
-.react-typer-char {
+.reactyper-char {
   /* styles for any character of the typer */
 }
 
-.react-typer-char.typed {
+.reactyper-char.typed {
   /* styles for a character that has been typed */
 }
 
-.react-typer-char.untyped {
+.reactyper-char.untyped {
   /* styles for a character that has not been typed */
 }
 
-.react-typer-char.erased {
+.reactyper-char.erased {
   /* styles for a character that has been erased */
   /* see eraseStyle */
 }
 
-.react-typer-char.selected {
+.reactyper-char.selected {
   /* styles for a character that has been selected */
   /* see eraseStyle */
 }
 
-.react-typer-caret {
+.reactyper-caret {
   /* styles for the caret span */
 }
 
-.react-typer-caret.blink {
+.reactyper-caret.blink {
   /* animation for a smooth cursor */
 }
 
-.react-typer-caret.smooth {
+.reactyper-caret.smooth {
   /* animation for a smooth caret */
 }
 ```

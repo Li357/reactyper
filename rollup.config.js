@@ -54,7 +54,7 @@ export default [
   {
     ...base,
     output: {
-      file: 'dist/react-typer.min.js',
+      file: 'dist/reactyper.min.js',
       format: 'umd',
       globals: {
         react: 'React',

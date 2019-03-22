@@ -226,7 +226,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     const isSelectionAndErasing = typerState === TyperState.ERASING && isSelectionErase;
 
     return (
-      <span className="react-typer">
+      <span className="reactyper">
         {leftChars.map((char, i) => (
           <Character key={i} value={char} status={CharacterStatus.TYPED} />
         ))}

@@ -47,11 +47,15 @@ or
 
 Then import:
 
-    import Typer from 'reactyper';
+```js
+import Typer from 'reactyper';
+```
 
 #### Browser
 
-    <script src="https://unpkg.com/reactyper/dist/reactyper.min.js">
+```html
+<script src="https://unpkg.com/reactyper/dist/reactyper.min.js">
+```
 
 And access via `window.Typer`.
 

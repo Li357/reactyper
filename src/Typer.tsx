@@ -2,10 +2,64 @@ import React, { Component } from 'react';
 import split from 'lodash.split';
 
 import Caret from './Caret';
-import Character from './Character';
-import { CaretAnimationStyle, EraseStyle, ITyperProps, ITyperState, TyperState, CharacterStatus } from './types';
+import Character, { CharacterStatus } from './Character';
 import shuffle from './util/shuffle';
 import './styles/Typer.css';
+
+export const enum TyperState {
+  TYPING = 'typing',
+  ERASING = 'erasing',
+  COMPLETE = 'complete',
+  IDLE = 'idle',
+}
+
+export const enum EraseStyle {
+  BACKSPACE = 'backspace',
+  SELECT = 'select',
+  SELECTALL = 'select-all',
+  CLEAR = 'clear',
+}
+
+export const enum CaretAnimationStyle {
+  SOLID = 'solid',
+  BLINK = 'blink',
+  SMOOTH = 'smooth',
+}
+
+export interface ITyperProps {
+  spool: string[];
+  repeats: number;
+  shuffle: boolean;
+
+  preTypeDelay: number;
+  typeDelay: number;
+  preEraseDelay: number;
+  eraseDelay: number;
+
+  initialAction: TyperState.TYPING | TyperState.ERASING;
+  eraseOnComplete: boolean;
+  eraseStyle: EraseStyle;
+  caretAnimationStyle: CaretAnimationStyle;
+
+  onType: (typed: string) => void;
+  onTyped: (typed: string) => void;
+  onErase: (erased: string) => void;
+  onErased: (erased: string) => void;
+  onFinish: () => void;
+}
+
+export interface ITyperState {
+  repeatCount: number;
+  spool: string[];
+  spoolIndex: number;
+  wordIndex: number;
+  currentWord: string;
+  currentChars: string[];
+
+  typerState: TyperState;
+  typerTimeout: number;
+  typerInterval: number;
+}
 
 export default class Typer extends Component<ITyperProps, ITyperState> {
   public static defaultProps: ITyperProps = {
@@ -103,7 +157,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   private startTyping = (reset: boolean = false) => {
     const { preTypeDelay, typeDelay } = this.props;
 
-    const typerTimeout = setTimeout(async () => {
+    const typerTimeout = window.setTimeout(async () => {
       if (reset) {
         await this.resetSpool();
       } else {
@@ -113,7 +167,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
       await this.safeSetState({ typerState: TyperState.TYPING });
       await this.typeStep();
       if (this.state.currentWord.length > 1) { // Since a one-length string will finish typing after initial step
-        const typerInterval = setInterval(this.typeStep, typeDelay);
+        const typerInterval = window.setInterval(this.typeStep, typeDelay);
         this.setState({ typerInterval });
       }
     }, preTypeDelay);
@@ -155,11 +209,11 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   private startErasing = async () => {
     const { preEraseDelay, eraseDelay } = this.props;
 
-    const typerTimeout = setTimeout(async () => {
+    const typerTimeout = window.setTimeout(async () => {
       await this.safeSetState({ typerState: TyperState.ERASING });
       await this.eraseStep();
       if (this.state.currentWord.length > 1) { // See startTyping
-        const typerInterval = setInterval(this.eraseStep, eraseDelay);
+        const typerInterval = window.setInterval(this.eraseStep, eraseDelay);
         this.setState({ typerInterval });
       }
     }, preEraseDelay);

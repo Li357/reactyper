@@ -2,8 +2,7 @@ import React from 'react';
 import { configure, render } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import Character from '../../src/Character';
-import { ICharacterProps, CharacterStatus } from '../../src/types';
+import Character, { ICharacterProps, CharacterStatus } from '../../src/Character';
 
 configure({ adapter: new Adapter() });
 

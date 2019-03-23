@@ -2,8 +2,7 @@ import React from 'react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import Typer from '../../src/Typer';
-import { TyperState, ITyperProps, EraseStyle } from '../../src/types';
+import Typer, { TyperState, ITyperProps, EraseStyle } from '../../src/Typer';
 import { testInstance } from './utils';
 
 configure({ adapter: new Adapter() });

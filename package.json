@@ -5,13 +5,11 @@
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "files": [
-    "dist"
+    "/dist"
   ],
-  "types": "index.d.ts",
+  "types": "dist/index.d.ts",
   "repository": "git+https://github.com/Li357/reactyper.git",
-  "bugs": {
-    "url": "https://github.com/Li357/reactyper/issues"
-  },
+  "bugs": "https://github.com/Li357/reactyper/issues",
   "homepage": "https://github.com/Li357/reactyper#readme",
   "author": "Andrew Li",
   "license": "MIT",

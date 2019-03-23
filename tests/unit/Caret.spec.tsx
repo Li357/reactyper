@@ -2,8 +2,8 @@ import React from 'react';
 import { configure, render } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import Caret from '../../src/Caret';
-import { CaretAnimationStyle, ICaretProps } from '../../src/types';
+import Caret, { ICaretProps } from '../../src/Caret';
+import { CaretAnimationStyle } from '../../src/Typer';
 
 configure({ adapter: new Adapter() });
 

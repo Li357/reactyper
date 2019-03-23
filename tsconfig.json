@@ -3,7 +3,7 @@
     "target": "es5",
     "module": "es2015",
     "jsx": "react",
-    "outDir": "./dist",
+    "declaration": true,
     "strict": true,
     "alwaysStrict": true,
     "esModuleInterop": true

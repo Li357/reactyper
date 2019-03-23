@@ -1,1 +1,0 @@
-export { TyperState, EraseStyle, CaretAnimationStyle } from './src/types';

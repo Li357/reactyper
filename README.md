@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="demo.gif" height="100">
+  <img alt="ReacTyper Demo GIF" src="demo.gif">
   <br />
   <b>A React component that types.</b>
   <br />

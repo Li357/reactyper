@@ -166,7 +166,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
 
       await this.safeSetState({ typerState: TyperState.TYPING });
       await this.typeStep();
-      if (this.state.currentWord.length > 1) { // Since a one-length string will finish typing after initial step
+      if (this.state.currentChars.length > 1) { // Since a one-length string will finish typing after initial step
         const typerInterval = window.setInterval(this.typeStep, typeDelay);
         this.setState({ typerInterval });
       }
@@ -207,12 +207,15 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   }
 
   private startErasing = async () => {
-    const { preEraseDelay, eraseDelay } = this.props;
+    const { preEraseDelay, eraseDelay, eraseStyle } = this.props;
 
     const typerTimeout = window.setTimeout(async () => {
       await this.safeSetState({ typerState: TyperState.ERASING });
       await this.eraseStep();
-      if (this.state.currentWord.length > 1) { // See startTyping
+      // Should repeat erasing if the currentChars length is greater than 1
+      // But NOT if we have SELECTALL or CLEAR eraseStyles, they are completely erased on first step
+      const isAllEraseStyle = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.CLEAR;
+      if (!isAllEraseStyle && this.state.currentChars.length > 1) {
         const typerInterval = window.setInterval(this.eraseStep, eraseDelay);
         this.setState({ typerInterval });
       }

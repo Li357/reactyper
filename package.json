@@ -18,7 +18,8 @@
     "build:watch": "yarn build -w",
     "lint": "yarn tslint -c tslint.json 'src/**/*.ts*'",
     "test": "yarn jest --coverage",
-    "test:watch": "yarn test --watch"
+    "test:watch": "yarn test --watch",
+    "prepublish": "yarn lint && yarn test && yarn build"
   },
   "keywords": [
     "reactyper",

@@ -2,29 +2,14 @@ import React, { Component } from 'react';
 import split from 'lodash.split';
 
 import Caret from './Caret';
-import Character, { CharacterStatus } from './Character';
+import Character from './Character';
 import shuffle from './util/shuffle';
 import './styles/Typer.css';
 
-export const enum TyperState {
-  TYPING = 'typing',
-  ERASING = 'erasing',
-  COMPLETE = 'complete',
-  IDLE = 'idle',
-}
-
-export const enum EraseStyle {
-  BACKSPACE = 'backspace',
-  SELECT = 'select',
-  SELECTALL = 'select-all',
-  CLEAR = 'clear',
-}
-
-export const enum CaretAnimationStyle {
-  SOLID = 'solid',
-  BLINK = 'blink',
-  SMOOTH = 'smooth',
-}
+type InitialAction = 'typing' | 'erasing';
+type TyperState = InitialAction | 'idle' | 'complete';
+type CaretAnimationStyle = 'solid' | 'blink' | 'smooth';
+type EraseStyle = 'backspace' | 'select' | 'select-all' | 'clear';
 
 export interface ITyperProps {
   spool: string[];
@@ -36,7 +21,7 @@ export interface ITyperProps {
   preEraseDelay: number;
   eraseDelay: number;
 
-  initialAction: TyperState.TYPING | TyperState.ERASING;
+  initialAction: InitialAction;
   eraseOnComplete: boolean;
   eraseStyle: EraseStyle;
   caretAnimationStyle: CaretAnimationStyle;
@@ -72,10 +57,10 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     preEraseDelay: 2000,
     eraseDelay: 250,
 
-    initialAction: TyperState.TYPING,
+    initialAction: 'typing',
     eraseOnComplete: false,
-    eraseStyle: EraseStyle.BACKSPACE,
-    caretAnimationStyle: CaretAnimationStyle.BLINK,
+    eraseStyle: 'backspace',
+    caretAnimationStyle: 'blink',
 
     onType: () => undefined,
     onTyped: () => undefined,
@@ -97,7 +82,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
       currentWord: '',
       currentChars: [],
 
-      typerState: TyperState.IDLE,
+      typerState: 'idle',
       typerTimeout: 0,
       typerInterval: 0,
     };
@@ -105,9 +90,9 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
 
   public async componentDidMount() {
     const { initialAction } = this.props;
-    if (initialAction === TyperState.TYPING) {
+    if (initialAction === 'typing') {
       this.startTyping();
-    } else if (initialAction === TyperState.ERASING) {
+    } else if (initialAction === 'erasing') {
       await this.advanceSpool();
       await this.shiftCaret(this.state.currentWord.length);
       this.startErasing();
@@ -164,7 +149,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
         await this.advanceSpool();
       }
 
-      await this.safeSetState({ typerState: TyperState.TYPING });
+      await this.safeSetState({ typerState: 'typing' });
       await this.typeStep();
       if (this.state.currentChars.length > 1) { // Since a one-length string will finish typing after initial step
         const typerInterval = window.setInterval(this.typeStep, typeDelay);
@@ -196,7 +181,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     clearInterval(typerInterval);
     onTyped(currentWord);
 
-    await this.safeSetState({ typerState: TyperState.IDLE });
+    await this.safeSetState({ typerState: 'idle' });
     if (isLastWord) {
       if (eraseOnComplete || shouldRepeat) {
         return this.startErasing();
@@ -210,11 +195,11 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     const { preEraseDelay, eraseDelay, eraseStyle } = this.props;
 
     const typerTimeout = window.setTimeout(async () => {
-      await this.safeSetState({ typerState: TyperState.ERASING });
+      await this.safeSetState({ typerState: 'erasing' });
       await this.eraseStep();
       // Should repeat erasing if the currentChars length is greater than 1
       // But NOT if we have SELECTALL or CLEAR eraseStyles, they are completely erased on first step
-      const isAllEraseStyle = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.CLEAR;
+      const isAllEraseStyle = eraseStyle === 'select-all' || eraseStyle === 'clear';
       if (!isAllEraseStyle && this.state.currentChars.length > 1) {
         const typerInterval = window.setInterval(this.eraseStep, eraseDelay);
         this.setState({ typerInterval });
@@ -225,7 +210,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
 
   private eraseStep = async () => {
     const { eraseStyle } = this.props;
-    const isAllEraseStyle = eraseStyle === EraseStyle.SELECTALL || eraseStyle === EraseStyle.CLEAR;
+    const isAllEraseStyle = eraseStyle === 'select-all' || eraseStyle === 'clear';
 
     await this.shiftCaret(isAllEraseStyle ? -this.state.wordIndex : -1);
 
@@ -248,7 +233,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     clearInterval(typerInterval);
     onErased(currentWord);
 
-    await this.safeSetState({ typerState: TyperState.IDLE });
+    await this.safeSetState({ typerState: 'idle' });
     if (isLastWord) {
       if (shouldRepeat) {
         return this.startTyping(true);
@@ -259,7 +244,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
   }
 
   private finish = async () => {
-    await this.safeSetState({ typerState: TyperState.COMPLETE });
+    await this.safeSetState({ typerState: 'complete' });
     this.props.onFinish();
   }
 
@@ -276,20 +261,20 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     const leftChars = currentChars.slice(0, wordIndex);
     const rightChars = currentChars.slice(wordIndex);
 
-    const isTyping = typerState === TyperState.TYPING;
-    const isFinished = typerState === TyperState.COMPLETE;
-    const isSelectionErase = eraseStyle === EraseStyle.SELECT || eraseStyle === EraseStyle.SELECTALL;
-    const rightStatus = isSelectionErase ? CharacterStatus.SELECTED : CharacterStatus.ERASED;
-    const isSelectionAndErasing = typerState === TyperState.ERASING && isSelectionErase;
+    const isTyping = typerState === 'typing';
+    const isFinished = typerState === 'complete';
+    const isSelectionErase = eraseStyle === 'select' || eraseStyle === 'select-all';
+    const rightStatus = isSelectionErase ? 'selected' : 'erased';
+    const isSelectionAndErasing = typerState === 'erasing' && isSelectionErase;
 
     return (
       <span className="reactyper">
         {leftChars.map((char, i) => (
-          <Character key={i} value={char} status={CharacterStatus.TYPED} />
+          <Character key={i} value={char} status="typed" />
         ))}
         {!(isFinished || isSelectionAndErasing) && <Caret animation={this.props.caretAnimationStyle} />}
         {rightChars.map((char, i) => (
-          <Character key={i} value={char} status={isTyping ? CharacterStatus.UNTYPED : rightStatus} />
+          <Character key={i} value={char} status={isTyping ? 'untyped' : rightStatus} />
         ))}
       </span>
     );

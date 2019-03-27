@@ -2,7 +2,7 @@ import React from 'react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import Typer, { TyperState, ITyperProps, EraseStyle } from '../../src/Typer';
+import Typer, { ITyperProps } from '../../src/Typer';
 import { testInstance } from './utils';
 
 configure({ adapter: new Adapter() });
@@ -70,7 +70,7 @@ describe('Typer', () => {
       const expectState = testInstance(instance);
 
       await advanceTimersByTime(preTypeDelay);
-      expectState({ typerState: TyperState.COMPLETE, repeatCount: 0 });
+      expectState({ typerState: 'complete', repeatCount: 0 });
     });
 
     it('should not repeat and should erase on completion', async () => {
@@ -78,10 +78,10 @@ describe('Typer', () => {
       const expectState = testInstance(instance);
 
       await advanceTimersByTime(preTypeDelay);
-      expectState({ typerState: TyperState.IDLE, repeatCount: 0 });
+      expectState({ typerState: 'idle', repeatCount: 0 });
 
       await advanceTimersByTime(preEraseDelay);
-      expectState({ typerState: TyperState.COMPLETE, repeatCount: 0 });
+      expectState({ typerState: 'complete', repeatCount: 0 });
     });
 
     it('should repeat specified times and should not erase on completion', async () => {
@@ -89,13 +89,13 @@ describe('Typer', () => {
       const expectState = testInstance(instance);
 
       await advanceTimersByTime(preTypeDelay);
-      expectState({ typerState: TyperState.IDLE, repeatCount: 0 });
+      expectState({ typerState: 'idle', repeatCount: 0 });
 
       await advanceTimersByTime(preEraseDelay);
-      expectState({ typerState: TyperState.IDLE, repeatCount: 0 });
+      expectState({ typerState: 'idle', repeatCount: 0 });
 
       await advanceTimersByTime(preTypeDelay); // repeatCount should increment at next type start
-      expectState({ typerState: TyperState.COMPLETE, repeatCount: 1 });
+      expectState({ typerState: 'complete', repeatCount: 1 });
     });
 
     it('should repeat specified times and should erase on completion', async () => {
@@ -103,14 +103,14 @@ describe('Typer', () => {
       const expectState = testInstance(instance);
 
       await advanceTimersByTime(preTypeDelay);
-      expectState({ typerState: TyperState.IDLE, repeatCount: 0 });
+      expectState({ typerState: 'idle', repeatCount: 0 });
       await advanceTimersByTime(preEraseDelay);
-      expectState({ typerState: TyperState.IDLE, repeatCount: 0 });
+      expectState({ typerState: 'idle', repeatCount: 0 });
 
       await advanceTimersByTime(preTypeDelay);
-      expectState({ typerState: TyperState.IDLE, repeatCount: 1 });
+      expectState({ typerState: 'idle', repeatCount: 1 });
       await advanceTimersByTime(preEraseDelay);
-      expectState({ typerState: TyperState.COMPLETE, repeatCount: 1 });
+      expectState({ typerState: 'complete', repeatCount: 1 });
     });
 
     it('should run (repeats + 1) * spool.length times', async () => {
@@ -125,11 +125,12 @@ describe('Typer', () => {
       await advanceTimersByTime(preTypeDelay, preEraseDelay);
       expectState({ spoolIndex: 0, repeatCount: 1 });
       await advanceTimersByTime(preTypeDelay, preEraseDelay);
-      expectState({ spoolIndex: 1, repeatCount: 1, typerState: TyperState.COMPLETE });
+      expectState({ spoolIndex: 1, repeatCount: 1, typerState: 'complete' });
     });
   });
 
   describe('eraseStyle', () => {
+    type EraseStyle = 'backspace' | 'select' | 'select-all' | 'clear';
     const renderWithStyle = (eraseStyle: EraseStyle) => renderWithProps({
       repeats: 0,
       eraseOnComplete: true,
@@ -138,7 +139,7 @@ describe('Typer', () => {
     });
 
     it('should clear all characters with select-all', async () => {
-      const instance = renderWithStyle(EraseStyle.SELECTALL);
+      const instance = renderWithStyle('select-all');
       const expectState = testInstance(instance);
 
       await advanceTimersByTime(preTypeDelay, typeDelay);
@@ -149,7 +150,7 @@ describe('Typer', () => {
     });
 
     it('should clear all characters with clear', async () => {
-      const instance = renderWithStyle(EraseStyle.CLEAR);
+      const instance = renderWithStyle('clear');
       const expectState = testInstance(instance);
 
       await advanceTimersByTime(preTypeDelay, typeDelay);
@@ -161,7 +162,8 @@ describe('Typer', () => {
   });
 
   describe('initialAction', () => {
-    const renderWithAction = (initialAction: TyperState.TYPING | TyperState.ERASING) => (
+    type InitialAction = 'typing' | 'erasing';
+    const renderWithAction = (initialAction: InitialAction) => (
       renderWithProps({
         repeats: 0,
         spool: ['abc'],
@@ -170,7 +172,7 @@ describe('Typer', () => {
     );
 
     it('should start typing', async () => {
-      const instance = renderWithAction(TyperState.TYPING);
+      const instance = renderWithAction('typing');
       const expectState = testInstance(instance);
 
       await advanceTimersByTime(preTypeDelay);
@@ -178,7 +180,7 @@ describe('Typer', () => {
     });
 
     it('should start erasing', async () => {
-      const instance = renderWithAction(TyperState.ERASING);
+      const instance = renderWithAction('erasing');
       const expectState = testInstance(instance);
 
       await advanceTimersByTime(preTypeDelay);

@@ -2,12 +2,7 @@ import React from 'react';
 
 import './styles/Character.css';
 
-export const enum CharacterStatus {
-  UNTYPED = 'untyped',
-  TYPED = 'typed',
-  SELECTED = 'selected',
-  ERASED = 'erased',
-}
+type CharacterStatus = 'untyped' | 'typed' | 'selected' | 'erased';
 
 export interface ICharacterProps {
   value: string;

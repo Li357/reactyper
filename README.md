@@ -3,7 +3,7 @@
   <br />
   <b>A Preact component that types.</b>
   <br />
-  Inspired by <a href="https://github.com/cngu/vue-typer">vue-typer</a>.  
+  Inspired by <a href="https://github.com/cngu/vue-typer">vue-typer</a>.
   Forked from <a href="https://github.com/Li357/reactyper">reactyper</a>.
 </p>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import { h } from 'preact';
 
 import './styles/Caret.css';
 
@@ -7,5 +7,5 @@ export interface ICaretProps {
 }
 
 export default function Caret({ animation }: ICaretProps) {
-  return (<span className={`reactyper-caret ${animation}`}></span>);
+  return (<span className={`preactyper-caret ${animation}`}></span>);
 }

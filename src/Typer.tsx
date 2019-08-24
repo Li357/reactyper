@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { h, Component } from 'preact';
 import split from 'lodash.split';
 
 import Caret from './Caret';
@@ -268,7 +268,7 @@ export default class Typer extends Component<ITyperProps, ITyperState> {
     const isSelectionAndErasing = typerState === 'erasing' && isSelectionErase;
 
     return (
-      <span className="reactyper">
+      <span className="preactyper">
         {leftChars.map((char, i) => (
           <Character key={i} value={char} status="typed" />
         ))}

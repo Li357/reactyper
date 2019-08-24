@@ -1,6 +1,7 @@
 import typescript from 'rollup-plugin-typescript2';
 import resolve from 'rollup-plugin-node-resolve';
 import postcss from 'rollup-plugin-postcss';
+import commonjs from 'rollup-plugin-commonjs';
 import autoprefixer from 'autoprefixer';
 import buble from 'rollup-plugin-buble';
 import { terser } from 'rollup-plugin-terser';
@@ -19,15 +20,13 @@ const base = {
       typescript: require('typescript'),
       objectHashIgnoreUnknownHack: true,
     }),
-    resolve(),
     buble({
 			jsx: 'h',
-			objectAssign: 'Object.assign'
-		}),
-		nodeResolve({
-			modules: true,
-			jsnext: true
-		}),
+      objectAssign: 'Object.assign',
+      exclude: '**/*.css'
+    }),
+    commonjs(),
+		resolve(),
     postcss({
       plugins: [
         autoprefixer({ browsers: ['last 2 versions'] }),
@@ -54,7 +53,7 @@ export default [
     ...base,
     output: {
       file: 'dist/reactyper.min.js',
-      format: 'umd',
+      format: 'esm',
       globals: {
         react: 'React',
         'lodash.split': '_.split',

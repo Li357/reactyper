@@ -1,4 +1,4 @@
-import React from 'react';
+import { h } from 'preact';
 
 import './styles/Character.css';
 
@@ -10,5 +10,5 @@ export interface ICharacterProps {
 }
 
 export default function Character({ value, status }: ICharacterProps) {
-  return (<span className={`reactyper-char ${status}`}>{value}</span>);
+  return (<span className={`preactyper-char ${status}`}>{value}</span>);
 }

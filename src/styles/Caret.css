@@ -8,13 +8,13 @@
   60%, 100% { opacity: 0; }
 }
 
-.reactyper-caret {
+.preactyper-caret {
   display: inline-block;
   width: 1px;
   background-color: black;
 }
 
-.reactyper-caret:empty:before {
+.preactyper-caret:empty:before {
   content: '\200b';
 }
 

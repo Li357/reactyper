@@ -1,8 +1,8 @@
 import typescript from 'rollup-plugin-typescript2';
 import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
 import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
+import buble from 'rollup-plugin-buble';
 import { terser } from 'rollup-plugin-terser';
 
 import pkg from './package.json';
@@ -20,7 +20,14 @@ const base = {
       objectHashIgnoreUnknownHack: true,
     }),
     resolve(),
-    commonjs(),
+    buble({
+			jsx: 'h',
+			objectAssign: 'Object.assign'
+		}),
+		nodeResolve({
+			modules: true,
+			jsnext: true
+		}),
     postcss({
       plugins: [
         autoprefixer({ browsers: ['last 2 versions'] }),
@@ -35,14 +42,6 @@ const base = {
 };
 
 export default [
-  {
-    ...base,
-    output: {
-      file: pkg.main,
-      format: 'cjs',
-    },
-    external: getDependencies(pkg),
-  },
   {
     ...base,
     output: {

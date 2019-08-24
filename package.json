@@ -1,6 +1,6 @@
 {
   "name": "preactyper",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A Preact component that types.",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -25,11 +25,11 @@
     "prepublish": "yarn build"
   },
   "keywords": [
-    "reactyper",
-    "react-typer",
-    "react",
-    "react.js",
-    "reactjs",
+    "preactyper",
+    "preact-typer",
+    "preact",
+    "preact.js",
+    "preactjs",
     "component",
     "typer",
     "typing",
@@ -58,9 +58,6 @@
     "ts-jest": "^23.10.5",
     "tslint": "^5.12.1",
     "typescript": "^3.2.4"
-  },
-  "peerDependencies": {
-    "react": ">=15.5.4"
   },
   "dependencies": {
     "lodash.split": "^4.4.2"

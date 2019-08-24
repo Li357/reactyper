@@ -59,7 +59,6 @@ export default [
         'lodash.split': '_.split',
       },
       name: 'Typer',
-    },
-    external: Object.keys(pkg.peerDependencies),
-  },
+    }
+  }
 ];

@@ -29,10 +29,13 @@ Then import:
 import Typer from 'preactyper';
 ```
 
-#### Usage
+## Usage
 
 See [Li356/reactyper](https://github.com/Li356/reactyper/blob/master/README.md) for details on how to use it. Just make sure you use `preactyper` in your import statement.
 
+
 ## License
 
-© 2019-Present Andrew Li. [MIT](https://opensource.org/licenses/MIT) License. 
+
+© 2019-Present Nico Domino. [MIT](https://opensource.org/licenses/MIT) License.  
+Original Version - © 2019-Present Andrew Li. [MIT](https://opensource.org/licenses/MIT) License. 

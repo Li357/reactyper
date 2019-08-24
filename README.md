@@ -37,5 +37,4 @@ See [Li356/reactyper](https://github.com/Li356/reactyper/blob/master/README.md) 
 ## License
 
 
-© 2019-Present Nico Domino. [MIT](https://opensource.org/licenses/MIT) License.  
-Original Version - © 2019-Present Andrew Li. [MIT](https://opensource.org/licenses/MIT) License. 
+License [MIT](https://opensource.org/licenses/MIT)

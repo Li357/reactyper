@@ -31,7 +31,7 @@ import Typer from 'preactyper';
 
 ## Usage
 
-See [Li356/reactyper](https://github.com/Li356/reactyper/blob/master/README.md) for details on how to use it. Just make sure you use `preactyper` in your import statement.
+See [Li357/reactyper](https://github.com/Li357/reactyper/blob/master/README.md) for details on how to use it. Just make sure you use `preactyper` in your import statement.
 
 
 ## License
